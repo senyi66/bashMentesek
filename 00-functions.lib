@@ -1,0 +1,218 @@
+#!/bin/bash
+#
+# Keszitette: Sényi Zsolt - senyi.eu
+# 2020
+#
+
+function pause(){
+# hasznalata:
+# pause 'Nyomjon [Enter] -t a folytatáshoz...'
+   read -p "$*"
+   }
+
+function log-info-write(){
+if [ $# -lt 4 ] ; then
+    clear
+ echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1. mit csinaljon a log iro fuggveny
+    echo 1.0 = 0 akkor infokent irja ki a szoveget.....
+    echo 1.1 = 1 akkor hibakent lep fel es kilep
+    echo 1.2 = 2 ekkor a konyvtarak merete irja ki
+    echo 1.3 = E ekkor uj fajlt hoz letre
+    echo 2. mit irjon a fajlba
+    echo 3. hova melyik konyvtarba irjuk.
+    echo 4. mi legyen a fajl neve
+    echo 5. hol van a mentes konyvtara
+    echo ------------------------------------------------------
+    exit
+fi
+
+if [ $1 = 0 ]; then
+    mkdir -p $3
+    echo "info: $2 $(date +%Y-%m-%d) $(date +%T)" >> $3/$4
+elif [ $1 = 1 ]; then
+    mkdir -p $3
+    echo "error: $2 $(date +%Y-%m-%d) $(date +%T)" >> $3/$4
+elif [ $1 = 2 ]; then
+    mkdir -p $3
+    cd $5
+#    du -h --summarize * >> $3/$4
+    du -shc --summarize -- {.[!.],..?,}* >> $3/$4
+elif [ $1 = E ]; then
+    mkdir -p $3
+    echo "info: $2 $(date +%Y-%m-%d) $(date +%T)" > $3/$4
+else
+    clear
+ echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1. mit csinaljon a log iro fuggveny
+    echo 1.0 = 0 akkor infokent irja ki a szoveget.....
+    echo 1.1 = 1 akkor hibakent lep fel es kilep
+    echo 1.2 = 2 ekkor a konyvtarak merete irja ki
+    echo 1.3 = E ekkor uj fajlt hoz letre
+    echo 2. mit irjon a fajlba
+    echo 3. hova melyik konyvtarba irjuk.
+    echo 4. mi legyen a fajl neve
+    echo 5. hol van a mentes konyvtara
+    echo ------------------------------------------------------
+    exit
+fi
+}
+
+function directory-check(){
+# konyvtarak letrehozasa parameter ellenorzessel
+# az elso if szerkezet azt ellenorzi adtunk -e meg legalabb 2 parametert a fuggvenynek
+# ha nem kilep
+# a masodik reszben jon a tovabbi elleorzes
+# feladat a konytar letrehozasa egyedileg vagy egy sorzszamozott vegu konyvtarak letrehozasa tol-ig parameterrel
+# pontosabb leiras a
+
+if [ $# -lt 2 ] ; then
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1.	mit csinaljon a konyvtar ellenorzo
+    echo 1.1 	= 0 hozzon letre konyvtarat
+    echo 1.2	= 1 hozzon letre konyvtarat pl 01-10 veguvel
+    echo 2. 	hol hozza letre a konyvtarat 
+    echo 3. 	mitol kezdodjon a konyvtar vege pl 1 = 01
+    echo 4. 	mire vegzodjon a konyvtar vege pl 50 = 50     
+    echo ------------------------------------------------------
+    exit 0
+fi
+
+if [ $1 = 0  ] && [ $2 != '' ] && [ $3 =  ]  && [ $4 =  ] ; then
+    mkdir -p $2
+elif [ $1 = 1  ] && [ $2 != '' ] && [ $3 != ''  ]  && [ $4 != ''  ] ; then
+    for i in `seq $3 $4`;
+	 do
+	local konyvtar="$2/DIR"
+	mkdir -p $(printf "$konyvtar%02i " $(seq $3 $4))
+    done
+else
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1.	mit csinaljon a konyvtar ellenorzo
+    echo 1.1 	= 0 hozzon letre konyvtarat
+    echo 1.2	= 1 hozzon letre konyvtarat pl 01-10 veguvel
+    echo 2. 	hol hozza letre a konyvtarat 
+    echo 3. 	mitol kezdodjon a konyvtar vege pl 1 = 01
+    echo 4. 	mire vegzodjon a konyvtar vege pl 50 = 50     
+    echo ------------------------------------------------------
+    exit
+fi
+}
+
+function teszt(){
+clear
+exit
+}
+
+function jogosultsag(){
+if [ $# -lt 5 ] ; then
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo ! Keves adat !
+    echo A helyes megadasi sorrend a kovetkezok
+    echo Mit csinal a jogosultsag fuggveny, milyen tipusu
+    echo 1.0 = 0 akkor Linux jogokat ad a megadott fajl kiterjeszteseknek
+    echo 1.0.2. '$2' Melyik konyvtarban 
+    echo 1.0.3. '$3' CHOWN szamok
+    echo 1.0.4.	'$4' csoport nev
+    echo 1.0.5.	'$5' felhasznalo
+    echo 1.0.6.	'$6' fajl kiterjesztes
+    echo pelda
+    echo  	    '$1     $2	               $3   $4   $5      $6'
+    echo jogosultsag 0 /mnt/munka/dokumentumok 550 root prenor '*.iso'
+    echo 
+    echo 1.1 = 1 akkor Windows + Linux jogokat ad a konytraraknak
+    echo ------------------------------------------------------
+    exit
+fi
+
+if [ $1 = 0 ]; then
+    echo "find $2 -name $6 -exec chown -R $4:$5 {} \;"
+    echo "find $2 -name $6 -exec chmod $3 {} \;"
+elif [ $1 = 1 ]; then
+    echo "setfacl -b $2/"
+    echo "find $2 -type d -exec chown -R $5:$4 {} \;"
+    echo "find $2 -type d -exec chmod $3 {} \;"
+    echo "setfacl -d -m g:$4:$6 $2"
+    echo "setfacl -d -m u:$5:$7 $2"
+elif [ $1 = 2 ]; then
+    echo "setfacl -b $2/"
+    echo "find $2 -type d -exec chown -R $5:$4 {} \;"
+    echo "find $2 -type d -exec chmod $3 {} \;"
+    echo "setfacl -d -m g:$4:$6 $2"
+    echo "setfacl -d -m u:$5:$7 $2"
+else
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1. mit csinaljon a jogosultsag fuggveny, milyen tipusu
+    echo 1.0 = 0 akkor Linux jogokat ad a megadott fajl kiterjeszteseknek
+    echo 1.0.2. '$2' Melyik konyvtarban 
+    echo 1.0.3. '$3' CHOWN szamok
+    echo 1.0.4.	'$4' csoport nev
+    echo 1.0.5.	'$5' felhasznalo
+    echo 1.0.6.	'$6' fajl kiterjesztes
+    echo pelda
+    echo  	    '$1     $2	               $3   $4   $5      $6'
+    echo jogosultsag 0 /mnt/munka/dokumentumok 550 root prenor '*.iso'
+    echo 1.1 = 1 akkor Windows + Linux jogokat ad a konytraraknak
+    echo ------------------------------------------------------
+    exit
+fi
+}
+
+
+function git-parancsok(){
+# git parancsok a verziókövetéshez
+
+
+if [ $# -lt 2 ] ; then
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1.	mit csinaljon a konyvtar ellenorzo
+    echo 1.1 	= 0 hozzon letre konyvtarat
+    echo 1.2	= 1 hozzon letre konyvtarat pl 01-10 veguvel
+    echo 2. 	hol hozza letre a konyvtarat 
+    echo 3. 	mitol kezdodjon a konyvtar vege pl 1 = 01
+    echo 4. 	mire vegzodjon a konyvtar vege pl 50 = 50     
+    echo ------------------------------------------------------
+    exit 0
+fi
+
+if [ $1 = 0  ] && [ $2 != '' ] && [ $3 =  ]  && [ $4 =  ] ; then
+    mkdir -p $2
+elif [ $1 = 1  ] && [ $2 != '' ] && [ $3 != ''  ]  && [ $4 != ''  ] ; then
+    for i in `seq $3 $4`;
+	 do
+	local konyvtar="$2/DIR"
+	mkdir -p $(printf "$konyvtar%02i " $(seq $3 $4))
+    done
+else
+    clear
+    echo !!! -- Nem adott meg minden parametert helyesen -- !!!
+    echo ------------------------------------------------------
+    echo A helyes megadasi sorrend a kovetkezok
+    echo 1.	mit csinaljon a konyvtar ellenorzo
+    echo 1.1 	= 0 hozzon letre konyvtarat
+    echo 1.2	= 1 hozzon letre konyvtarat pl 01-10 veguvel
+    echo 2. 	hol hozza letre a konyvtarat 
+    echo 3. 	mitol kezdodjon a konyvtar vege pl 1 = 01
+    echo 4. 	mire vegzodjon a konyvtar vege pl 50 = 50     
+    echo ------------------------------------------------------
+    exit
+fi
+}

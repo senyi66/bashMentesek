@@ -8,7 +8,7 @@
 # pause 'Nyomjon [Enter] -t a folytatashoz...'
 clear
 MYPWD=$(pwd)
-LOG_DIR="/mnt/mentes/fajlok/$(date +%Y)-$HOSTNAME"
+LOG_DIR="$(pwd)/log/$(date +%Y)-$HOSTNAME"
 # LOG_DIR=$(pwd)
 LOG_NAME="hwInfo-$HOSTNAME.txt"
 ### LOG_NAME="$HOSTNAME-"`basename $0`".txt"
