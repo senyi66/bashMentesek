@@ -160,6 +160,11 @@ hdparm -I /dev/sda /dev/sde >> $LOG_DIR/$LOG_NAME
 log-info-write 0 "______________________________________________" $LOG_DIR $LOG_NAME
 log-info-write 0 "______________________________________________" $LOG_DIR $LOG_NAME
 
+log-info-write 0 "Network info" $LOG_DIR $LOG_NAME
+ip a >> $LOG_DIR/$LOG_NAME
+
+log-info-write 0 "______________________________________________" $LOG_DIR $LOG_NAME
+log-info-write 0 "______________________________________________" $LOG_DIR $LOG_NAME
 
 log-info-write 0 "**********************************************" $LOG_DIR $LOG_NAME
 log-info-write 0 "Notebook akkumulátor adatai 01" $LOG_DIR $LOG_NAME
